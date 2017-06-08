@@ -70,14 +70,44 @@
                 <label for="frequency">Frequency</label>
                 <input class="form-control" id="frequency" type="number">
               </div>
-              <button class="btn btn-primary" id="submit-bid" type="submit">Submit</button>
+              <button class="btn btn-primary" id="submit-train" type="submit">Submit</button>
             </form>
           </div>
         </div>
       </div>
     </div>
   </div>
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript">
+    var config = {
+      apiKey: "AIzaSyAxD1ChrvG6q_HhYNU5mxf9ED7qjzC8k0o",
+      authDomain: "traintime-cafaa.firebaseapp.com",
+      databaseURL: "https://traintime-cafaa.firebaseio.com",
+      projectId: "traintime-cafaa",
+      storageBucket: "traintime-cafaa.appspot.com",
+      messagingSenderId: "856065463102"
+    };
+    firebase.initializeApp(config);
 
+    var database = firebase.database
+    var trainName;
+    var destination;
+    var frequency;
+    var trainTime;
+
+    $("#submit-train").on("click", function(event) {
+      event.preventDefault()
+      trainName = $("#train-name").val()
+      destination = $("#destination").val()
+      frequency = $("#frequency").val()
+      trainTime = $("#train-time").val()
+
+      console.log(trainName)
+      console.log(destination)
+      console.log(frequency)
+      console.log(trainTime)
+    })
+  </script>
 
 </body>
 
