@@ -53,7 +53,7 @@
             <h3 class="panel-title">Add Train</h3>
           </div>
           <div class="panel-body">
-            <form>
+            <form id="train-submit">
               <div class="form-group">
                 <label for="train-name">Train Name</label>
                 <input class="form-control" id="train-name" type="text">
@@ -70,7 +70,7 @@
                 <label for="frequency">Frequency</label>
                 <input class="form-control" id="frequency" type="number">
               </div>
-              <button class="btn btn-primary" id="submit-train" type="submit">Submit</button>
+              <button class="btn btn-primary" type="submit">Submit</button>
             </form>
           </div>
         </div>
@@ -78,6 +78,7 @@
     </div>
   </div>
   <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/4.1.2/firebase.js"></script>
   <script type="text/javascript">
     var config = {
       apiKey: "AIzaSyAxD1ChrvG6q_HhYNU5mxf9ED7qjzC8k0o",
@@ -89,18 +90,33 @@
     };
     firebase.initializeApp(config);
 
-    var database = firebase.database
+    var database = firebase.database();
     var trainName;
     var destination;
     var frequency;
     var trainTime;
 
-    $("#submit-train").on("click", function(event) {
+    database.ref().on("value", function(snapshot) {
+
+    }, function(errorObject) {
+      console.log(errorObject.code)
+
+    })
+    $("#train-submit").submit(function(event) {
       event.preventDefault()
       trainName = $("#train-name").val()
       destination = $("#destination").val()
       frequency = $("#frequency").val()
       trainTime = $("#train-time").val()
+
+
+
+      database.ref().set({
+        trainName: trainName,
+        destination: destination,
+        frequency: frequency,
+        trainTime: trainTime
+      })
 
       console.log(trainName)
       console.log(destination)
