@@ -35,7 +35,7 @@
                   <th>Minutes Away</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="table-body" >
 
               </tbody>
             </table>
@@ -64,11 +64,11 @@
               </div>
               <div class="form-group">
                 <label for="first-train-time">First Train Time</label>
-                <input class="form-control" id="train-time" type="number">
+                <input class="form-control" id="start-train-time" type="time">
               </div>
               <div class="form-group">
-                <label for="frequency">Frequency</label>
-                <input class="form-control" id="frequency" type="number">
+                <label for="frequency">Frequency(mins:1-60)</label>
+                <input class="form-control" id="frequency" type="number" max="60">
               </div>
               <button class="btn btn-primary" type="submit">Submit</button>
             </form>
@@ -78,50 +78,73 @@
     </div>
   </div>
   <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
   <script src="https://www.gstatic.com/firebasejs/4.1.2/firebase.js"></script>
   <script type="text/javascript">
-    var config = {
-      apiKey: "AIzaSyAxD1ChrvG6q_HhYNU5mxf9ED7qjzC8k0o",
-      authDomain: "traintime-cafaa.firebaseapp.com",
-      databaseURL: "https://traintime-cafaa.firebaseio.com",
-      projectId: "traintime-cafaa",
-      storageBucket: "traintime-cafaa.appspot.com",
-      messagingSenderId: "856065463102"
-    };
-    firebase.initializeApp(config);
+  var config = {
+  apiKey: "AIzaSyAxD1ChrvG6q_HhYNU5mxf9ED7qjzC8k0o",
+  authDomain: "traintime-cafaa.firebaseapp.com",
+  databaseURL: "https://traintime-cafaa.firebaseio.com",
+  projectId: "traintime-cafaa",
+  storageBucket: "traintime-cafaa.appspot.com",
+  messagingSenderId: "856065463102"
+};
+firebase.initializeApp(config);
 
     var database = firebase.database();
     var trainName;
     var destination;
     var frequency;
-    var trainTime;
+    var firstTrain;
+    var currentTime;
 
-    database.ref().on("value", function(snapshot) {
-
-    }, function(errorObject) {
-      console.log(errorObject.code)
-
-    })
     $("#train-submit").submit(function(event) {
       event.preventDefault()
       trainName = $("#train-name").val()
       destination = $("#destination").val()
       frequency = $("#frequency").val()
-      trainTime = $("#train-time").val()
+      firstTrain = $("#start-train-time").val()
 
 
-
-      database.ref().set({
+      database.ref().push({
         trainName: trainName,
         destination: destination,
         frequency: frequency,
-        trainTime: trainTime
+        firstTrain: firstTrain
       })
+    })
 
-      console.log(trainName)
-      console.log(destination)
-      console.log(frequency)
-      console.log(trainTime)
+    database.ref().on("child_added", function(childSnapshot) {
+
+      // console.log(childSnapshot.val().firstTrain)
+      var trainTimeConverted = moment(childSnapshot.val().firstTrain, "HH:mm");
+      // console.log(trainTimeConverted)
+
+      var timeElapsed = moment().diff(moment(trainTimeConverted), "minutes")
+      // console.log(timeElapsed)
+
+      var remainder = timeElapsed % childSnapshot.val().frequency
+      // console.log(remainder)
+
+      var untilNextTrain = childSnapshot.val().frequency - remainder
+      // console.log(untilNextTrain)
+
+      var nextTrain = moment().add(untilNextTrain, "minutes");
+      // console.log(nextTrain)
+
+
+
+      $("#table-body").append("<tr>" +
+        "<td>" + childSnapshot.val().trainName + "</td>" +
+        "<td>" + childSnapshot.val().destination + "</td>" +
+        "<td>" + childSnapshot.val().frequency + "</td>" +
+        "<td>" + nextTrain.format("hh:mm:A") + "</td>" +
+        "<td>" + untilNextTrain + "</td>" +
+
+        "</tr>")
+
+    }, function(errorObject) {
+      console.log(errorObject.code)
     })
   </script>
 
