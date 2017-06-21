@@ -113,6 +113,14 @@ firebase.initializeApp(config);
         firstTrain: firstTrain
       })
     })
+// 	var adaRef = firebase.database().ref(childSnapshot.key);
+// adaRef.remove()
+//   .then(function() {
+//     console.log("Remove succeeded.")
+//   })
+//   .catch(function(error) {
+//     console.log("Remove failed: " + error.message)
+//   });
 
     database.ref().on("child_added", function(childSnapshot) {
 
